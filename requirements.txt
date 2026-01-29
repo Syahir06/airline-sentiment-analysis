@@ -5,3 +5,8 @@ matplotlib
 seaborn
 nltk
 streamlit
+streamlit>=1.30.0
+altair<5
+pandas
+scikit-learn
+nltk
