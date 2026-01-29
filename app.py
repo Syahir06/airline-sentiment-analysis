@@ -3,16 +3,27 @@ import pickle
 import re
 import nltk
 from nltk.corpus import stopwords
+import os
 
-# Download stopwords
-nltk.download('stopwords')
-stop_words = set(stopwords.words('english'))
+# 1. Securely download NLTK data
+@st.cache_resource
+def load_nltk():
+    nltk.download('stopwords')
+    return set(stopwords.words('english'))
 
-# Load model & vectorizer
-model = pickle.load(open("model.pkl", "rb"))
-vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
+stop_words = load_nltk()
 
-# Text cleaning function (same as training)
+# 2. Load model & vectorizer with error handling
+@st.cache_resource
+def load_assets():
+    if not os.path.exists("model.pkl") or not os.path.exists("vectorizer.pkl"):
+        return None, None
+    model = pickle.load(open("model.pkl", "rb"))
+    vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
+    return model, vectorizer
+
+model, vectorizer = load_assets()
+
 def clean_text(text):
     text = text.lower()
     text = re.sub(r'http\S+', '', text)
@@ -22,34 +33,27 @@ def clean_text(text):
     words = [w for w in words if w not in stop_words]
     return " ".join(words)
 
-# Prediction function
-def predict_sentiment(text):
-    cleaned = clean_text(text)
-    vectorized = vectorizer.transform([cleaned])
-    prediction = model.predict(vectorized)[0]
-    return prediction
-
 # ---------------- UI ---------------- #
-
-st.set_page_config(page_title="Airline Tweet Sentiment AI", page_icon="✈️")
-
+st.set_page_config(page_title="Airline Sentiment AI", page_icon="✈️")
 st.title("✈️ Airline Tweet Sentiment Analysis")
-st.write("This AI model predicts whether a tweet is **Positive**, **Neutral**, or **Negative**.")
 
-user_input = st.text_area("Enter a tweet:")
+if model is None:
+    st.error("Error: 'model.pkl' and 'vectorizer.pkl' not found in the root directory!")
+else:
+    user_input = st.text_area("Enter a tweet about an airline:")
 
-if st.button("Analyze Sentiment"):
-    if user_input.strip() == "":
-        st.warning("Please enter some text.")
-    else:
-        result = predict_sentiment(user_input)
-
-        if result == "positive":
-            st.success(f"Predicted Sentiment: {result.upper()} 😊")
-        elif result == "neutral":
-            st.info(f"Predicted Sentiment: {result.upper()} 😐")
+    if st.button("Analyze Sentiment"):
+        if user_input.strip() == "":
+            st.warning("Please enter some text.")
         else:
-            st.error(f"Predicted Sentiment: {result.upper()} 😠")
+            # Clean and then Transform
+            cleaned = clean_text(user_input)
+            vectorized = vectorizer.transform([cleaned])
+            result = model.predict(vectorized)[0]
 
-st.markdown("---")
-st.caption("Built with Machine Learning + NLP + Streamlit")
+            if result == "positive":
+                st.success(f"Result: {result.upper()} 😊")
+            elif result == "neutral":
+                st.info(f"Result: {result.upper()} 😐")
+            else:
+                st.error(f"Result: {result.upper()} 😠")
