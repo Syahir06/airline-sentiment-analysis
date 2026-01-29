@@ -8,18 +8,31 @@ import os
 # 1. Securely download NLTK data
 @st.cache_resource
 def load_nltk():
-    nltk.download('stopwords')
+    try:
+        # Check if already exists to prevent repeated downloads
+        nltk.data.find('corpora/stopwords')
+    except LookupError:
+        nltk.download('stopwords')
     return set(stopwords.words('english'))
 
 stop_words = load_nltk()
 
-# 2. Load model & vectorizer with error handling
+# 2. Load model & vectorizer with the NEW folder path
 @st.cache_resource
 def load_assets():
-    if not os.path.exists("model.pkl") or not os.path.exists("vectorizer.pkl"):
+    # Define the paths pointing to your .py folder
+    model_path = os.path.join(".py", "model.pkl")
+    vec_path = os.path.join(".py", "vectorizer.pkl")
+    
+    # Check if files exist in that specific folder
+    if not os.path.exists(model_path) or not os.path.exists(vec_path):
         return None, None
-    model = pickle.load(open("model.pkl", "rb"))
-    vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
+    
+    with open(model_path, "rb") as f:
+        model = pickle.load(f)
+    with open(vec_path, "rb") as f:
+        vectorizer = pickle.load(f)
+        
     return model, vectorizer
 
 model, vectorizer = load_assets()
@@ -38,7 +51,9 @@ st.set_page_config(page_title="Airline Sentiment AI", page_icon="✈️")
 st.title("✈️ Airline Tweet Sentiment Analysis")
 
 if model is None:
-    st.error("Error: 'model.pkl' and 'vectorizer.pkl' not found in the root directory!")
+    # Updated error message to show where it's looking
+    st.error("Error: Could not find 'model.pkl' or 'vectorizer.pkl' inside the '.py' folder.")
+    st.info("Current files in '.py/' folder: " + str(os.listdir(".py") if os.path.exists(".py") else "Folder not found"))
 else:
     user_input = st.text_area("Enter a tweet about an airline:")
 
@@ -46,7 +61,6 @@ else:
         if user_input.strip() == "":
             st.warning("Please enter some text.")
         else:
-            # Clean and then Transform
             cleaned = clean_text(user_input)
             vectorized = vectorizer.transform([cleaned])
             result = model.predict(vectorized)[0]
