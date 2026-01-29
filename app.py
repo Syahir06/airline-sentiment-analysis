@@ -20,11 +20,10 @@ stop_words = load_nltk()
 # 2. Load model & vectorizer with the NEW folder path
 @st.cache_resource
 def load_assets():
-    # Define the paths pointing to your .py folder
-    model_path = os.path.join(".py", "model.pkl")
-    vec_path = os.path.join(".py", "vectorizer.pkl")
+    # Use the new folder name 'models'
+    model_path = os.path.join("models", "model.pkl")
+    vec_path = os.path.join("models", "vectorizer.pkl")
     
-    # Check if files exist in that specific folder
     if not os.path.exists(model_path) or not os.path.exists(vec_path):
         return None, None
     
