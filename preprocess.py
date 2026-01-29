@@ -23,5 +23,5 @@ def load_and_clean(path):
     return df
 
 if __name__ == "__main__":
-    df = load_and_clean("../data/Tweets.csv")
+    df = load_and_clean("Tweets.csv")
     print(df.head())
