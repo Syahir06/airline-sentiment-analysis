@@ -1,22 +1,12 @@
-# Airline Sentiment Analysis ✈️
+This project performs Sentiment Analysis on airline tweets using
+Natural Language Processing and Machine Learning.
 
-This project uses Machine Learning to classify airline customer reviews into:
-- Positive
-- Neutral
-- Negative
+Steps:
+1. Data cleaning
+2. Text preprocessing
+3. TF-IDF vectorization
+4. Logistic Regression classification
+5. Model evaluation
+6. Sentiment prediction
 
-## Dataset
-Airline Twitter Sentiment Dataset (Tweets.csv)
-
-## Techniques Used
-- Text preprocessing (NLP)
-- TF-IDF Vectorization
-- Logistic Regression
-- Model Evaluation
-
-## Accuracy
-Achieved ~80% accuracy.
-
-## How to Run
-pip install -r requirements.txt
-python train_model.py
+Accuracy achieved: ~82%
