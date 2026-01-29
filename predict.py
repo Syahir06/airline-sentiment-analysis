@@ -9,4 +9,4 @@ def predict_sentiment(text):
     text_vec = vectorizer.transform([text])
     return model.predict(text_vec)[0]
 
-print(predict_sentiment("The flight was amazing and staff were friendly"))
+print(predict_sentiment("The flight was delayed and terrible"))
