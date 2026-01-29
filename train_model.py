@@ -7,7 +7,7 @@ import pickle
 from preprocess import load_and_clean
 
 # Load data
-df = load_and_clean("../data/Tweets.csv")
+df = load_and_clean("Tweets.csv")
 
 X = df['clean_text']
 y = df['airline_sentiment']
